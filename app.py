@@ -12,6 +12,8 @@ import logging
 import re
 from pathlib import Path
 
+logging.FileHandler('logs/app.log')
+
 # Configuration du logging
 logging.basicConfig(
     level=logging.INFO,
