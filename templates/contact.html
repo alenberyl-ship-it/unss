@@ -28,6 +28,13 @@
             <p style="text-align: center; color: #666; margin-bottom: 2em;">
                 Vous avez une question ou souhaitez nous contacter ? Remplissez le formulaire ci-dessous et nous vous répondrons dans les meilleurs délais.
             </p>
+            
+            {% if error %}
+            <div style="background-color: #f8d7da; border-left: 5px solid #dc3545; padding: 1em; margin-bottom: 1.5em; border-radius: 8px; color: #721c24; max-width: 600px; margin-left: auto; margin-right: auto;">
+                <strong>⚠️ Erreur:</strong> {{ error }}
+            </div>
+            {% endif %}
+            
             <form method="POST" style="max-width: 600px; margin: 0 auto;">
                 <div>
                     <label for="nom">👤 Votre Nom :</label>

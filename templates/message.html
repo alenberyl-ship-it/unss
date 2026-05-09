@@ -64,9 +64,9 @@
     <main>
         <div class="message-container">
             {% if message %}
-                {% if 'Erreur' in message or 'incorrects' in message or 'non trouvé' in message %}
+                {% if error %}
                     <div class="message-content error">
-                        <strong>⚠️ Attention</strong><br>
+                        <strong>⚠️ Erreur</strong><br>
                         {{ message }}
                     </div>
                 {% else %}

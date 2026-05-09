@@ -79,8 +79,8 @@
 <body>
     <div class="login-container">
         <h2>🔐 Connexion Administrateur</h2>
-        {% if message %}
-            <div class="error">{{ message }}</div>
+        {% if error %}
+            <div class="error">{{ error }}</div>
         {% endif %}
         <form method="POST" action="{{ url_for('admin_login') }}">
             <div>
@@ -94,7 +94,7 @@
             <button type="submit" class="btn">Se connecter</button>
         </form>
         <div class="login-info">
-            <strong>Connexion de démonstration :</strong><br>
+            <strong>⚠️ Connexion de démonstration (CHANGEZ immédiatement) :</strong><br>
             Email: <code>admin@sauveteurs.com</code><br>
             Mot de passe: <code>admin123</code>
         </div>

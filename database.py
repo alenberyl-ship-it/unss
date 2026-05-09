@@ -1,8 +1,11 @@
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+import logging
+import os
 
-DATABASE_NAME = 'sauveteurs_goma.db'
+logger = logging.getLogger(__name__)
+DATABASE_NAME = os.getenv('DATABASE_NAME', 'sauveteurs_goma.db')
 
 def get_db_connection():
     conn = sqlite3.connect(DATABASE_NAME)
@@ -95,7 +98,21 @@ def get_membre_par_contact(contact):
         membre = cursor.fetchone()
         return membre
     except Exception as e:
-        print(f"Erreur lors de la récupération du membre : {e}")
+        logger.error(f"Erreur lors de la récupération du membre : {e}")
+        return None
+    finally:
+        close_db_connection(conn)
+
+def get_admin_par_contact(contact):
+    """Récupère un admin par son contact (email)"""
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM membres WHERE contact = ? AND is_admin = 1", (contact,))
+        admin = cursor.fetchone()
+        return admin
+    except Exception as e:
+        logger.error(f"Erreur lors de la récupération de l'admin: {e}")
         return None
     finally:
         close_db_connection(conn)
@@ -153,6 +170,7 @@ def est_administrateur(admin_id):
         print(f"Erreur lors de la vérification de l'administrateur : {e}")
         return False
 def creer_admin_par_defaut():
+    """Crée un administrateur par défaut UNIQUEMENT EN DÉVELOPPEMENT"""
     contact_admin = "admin@sauveteurs.com"
     mot_de_passe_admin = "admin123"
     
@@ -166,7 +184,21 @@ def creer_admin_par_defaut():
             photo_profil=None,
             is_admin=1
         )
-        print("Administrateur par défaut créé.")
+        logger.warning("⚠️ Administrateur par défaut créé (admin@sauveteurs.com/admin123) - À CHANGER EN PRODUCTION")
     else:
-        print("Administrateur par défaut déjà existant.")
+        logger.info("Administrateur par défaut déjà existant.")
+
+def compter_admins():
+    """Compte le nombre d'administrateurs"""
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) as count FROM membres WHERE is_admin = 1")
+        result = cursor.fetchone()
+        return result['count'] if result else 0
+    except Exception as e:
+        logger.error(f"Erreur lors du comptage des admins: {e}")
+        return 0
+    finally:
+        close_db_connection(conn)
 
