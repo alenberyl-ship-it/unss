@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Membres des Sauveteurs de Goma</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>👥 Nos Sauveteurs</h1>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">🏠 Accueil</a></li>
+                <li><a href="{{ url_for('liste_membres') }}">👥 Membres</a></li>
+                <li><a href="{{ url_for('index') }}#services">🎯 Services</a></li>
+                <li><a href="{{ url_for('index') }}#urgence">🚨 Urgence</a></li>
+                <li><a href="{{ url_for('contact') }}">📧 Contact</a></li>
+                {% if session.get('admin_id') %}
+                    <li><a href="{{ url_for('admin_dashboard') }}">⚙️ Admin</a></li>
+                    <li><a href="{{ url_for('logout') }}">🚪 Déconnexion</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="content-section">
+            <h2>👥 Liste de Nos Membres</h2>
+            {% if membres %}
+                <div class="membres-grid">
+                    {% for membre in membres %}
+                        <div class="member-card">
+                            {% if membre[5] %}
+                                <img src="{{ membre[5] }}" alt="Photo de {{ membre[1] }}" class="member-avatar">
+                            {% else %}
+                                <div class="member-avatar" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #0e4863, #136f65); color: white; font-size: 3em;">👤</div>
+                            {% endif %}
+                            <div class="member-info">
+                                <div class="member-name">{{ membre[1] }}</div>
+                                <div class="member-role">{{ membre[2] or 'Membre' }}</div>
+                                <div class="member-contact">📧 {{ membre[3] }}</div>
+                                {% if membre[6] == 1 %}
+                                    <span style="background: linear-gradient(135deg, #ffc107, #ff9800); color: #000; padding: 0.4em 0.8em; border-radius: 20px; font-size: 0.85em; font-weight: 600; display: inline-block; margin-top: 0.5em;">👑 Administrateur</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p style="text-align: center; color: #999; font-size: 1.1em;">Aucun membre enregistré pour le moment.</p>
+            {% endif %}
+        </section>
+
+        {% if session.get('admin_id') %}
+        <section class="content-section admin-section">
+            <h3>➕ Ajouter un nouveau membre</h3>
+            <form method="POST" action="{{ url_for('ajouter_nouveau_membre_admin') }}">
+                <div class="form-row">
+                    <div>
+                        <label for="nom">Nom complet :</label>
+                        <input type="text" id="nom" name="nom" required>
+                    </div>
+                    <div>
+                        <label for="role">Rôle :</label>
+                        <input type="text" id="role" name="role" placeholder="Ex: Sauveteur, Formateur...">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div>
+                        <label for="contact">Contact (Email ou Téléphone) :</label>
+                        <input type="text" id="contact" name="contact" required>
+                    </div>
+                    <div>
+                        <label for="password">Mot de passe :</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div>
+                        <label for="photo_profil">Photo de Profil (URL) :</label>
+                        <input type="text" id="photo_profil" name="photo_profil" placeholder="https://...">
+                    </div>
+                    <div style="display: flex; align-items: flex-end;">
+                        <label>
+                            <input type="checkbox" id="is_admin" name="is_admin" value="1">
+                            👑 Administrateur
+                        </label>
+                    </div>
+                </div>
+                <button type="submit" style="width: 100%;">✅ Ajouter le membre</button>
+            </form>
+        </section>
+        {% endif %}
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Les Sauveteurs de Goma | Équipe de Secours Dédiée</p>
+    </footer>
+</body>
+</html>
+            <div>
+                <label for="role">Rôle :</label>
+                <input type="text" id="role" name="role">
+            </div>
+            <div>
+                <label for="contact">Contact (Email ou Téléphone) :</label>
+                <input type="text" id="contact" name="contact" required>
+            </div>
+            <div>
+                <label for="password">Mot de passe :</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div>
+                <label for="photo_profil">Photo de Profil (chemin) :</label>
+                <input type="text" id="photo_profil" name="photo_profil">
+            </div>
+            <div>
+                <input type="checkbox" id="is_admin" name="is_admin" value="1">
+                <label for="is_admin">Administrateur</label>
+            </div>
+            <button type="submit">Ajouter le membre</button>
+        </form>
+        {% endif %}
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Les Sauveteurs de Goma</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

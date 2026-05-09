@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNSS Goma</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        nav ul {
+            display: flex;
+            justify-content: center;
+            gap: 1.5em;
+            list-style: none;
+            padding: 0;
+        }
+
+        nav li a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        nav li a:hover {
+            text-decoration: underline;
+        }
+
+        #afficher-formulaire {
+            background-color: #6c757d;
+            color: white;
+            padding: 0.8em 1.5em;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 1em;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        #afficher-formulaire:hover {
+            background-color: #545b62;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>UNSS Goma</h1>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Accueil</a></li>
+                <li><a href="{{ url_for('liste_membres') }}">Membres</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#urgence">Urgence</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li><a href="#prevention">Prévention</a></li>
+                <li><a href="#soutenir">Soutenir</a></li>
+                {% if session.get('admin_id') %}
+                    <li><a href="{{ url_for('admin_dashboard') }}">Admin</a></li>
+                    <li><a href="{{ url_for('logout') }}">Déconnexion</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="presentation" class="content-section">
+            <h2>Qui Sommes-Nous ?</h2>
+            <p id="equipe-info">Chargement des informations...</p>
+        </section>
+
+        <section id="services" class="content-section">
+            <h2>Nos Services et Interventions</h2>
+            <ul id="services-liste"></ul>
+        </section>
+
+  <section id="urgence" class="content-section urgent">
+    <h2>En Cas d'Urgence</h2>
+    <p class="numero-urgence" id="numero-urgence"></p>
+    <p><span id="urgence-details-btn" class="bouton-details">[+]</span></p>
+    <div id="urgence-details" class="details-cache"></div>  <!-- bien cachée par défaut -->
+</section>
+
+<section id="contact" class="content-section">
+    <h2>📧 Contactez-Nous</h2>
+    <p id="contact-info" style="text-align: center; margin-bottom: 2em;">Pour toute question ou demande d'information, veuillez nous contacter.</p>
+    
+    <form method="POST" action="{{ url_for('contact') }}" class="details-cache" style="max-width: 600px; margin: 0 auto;">
+        <div>
+            <label for="nom">👤 Votre Nom :</label>
+            <input type="text" id="nom" name="nom" placeholder="Jean Dupont" required>
+        </div>
+        <div>
+            <label for="email">📧 Votre Email :</label>
+            <input type="email" id="email" name="email" placeholder="jean@example.com" required>
+        </div>
+        <div>
+            <label for="message">💬 Votre Message :</label>
+            <textarea id="message" name="message" placeholder="Écrivez votre message ici..." rows="6" required></textarea>
+        </div>
+        <button type="submit">✅ Envoyer le message</button>
+    </form>
+    <button id="afficher-formulaire">📝 Afficher le formulaire de contact</button>
+</section>
+
+
+
+        <section id="prevention" class="content-section">
+            <h2>Conseils de Sécurité et de Prévention</h2>
+            <ul id="conseils-liste"></ul>
+        </section>
+
+        <section id="soutenir" class="content-section">
+            <h2>Soutenez Notre Action</h2>
+            <p id="soutien-info">Informations sur la manière de nous soutenir...</p>
+        </section>
+
+        <section id="articles" class="content-section">
+            <h2>Actualités et Articles</h2>
+            <ul style="list-style: none; padding: 0;">
+                {% for article in articles %}
+                    <li class="article-item">
+                        {% if article[4] %}
+                            <img src="{{ article[4] }}" alt="{{ article[1] }}" class="article-image">
+                        {% endif %}
+                        <h3>{{ article[1] }}</h3>
+                        <p>{{ article[2] | truncate(250) }}</p>
+                        <div class="article-meta">
+                            <span class="date-publication">📅 {{ article[3] }}</span>
+                            {% if article[5] %}
+                                <a href="{{ url_for('download_file', filepath=article[5]) }}" class="btn" download>📄 Télécharger PDF</a>
+                            {% endif %}
+                        </div>
+                        <div class="article-actions">
+                            {% if session.get('admin_id') %}
+                                <form method="POST" action="{{ url_for('supprimer_article', article_id=article[0]) }}" style="display:inline; flex: 1;">
+                                    <button type="submit" class="btn danger" onclick="return confirm('Êtes-vous sûr ?')">🗑️ Supprimer</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </li>
+                {% else %}
+                    <li><p style="text-align: center; color: #999;">Aucun article pour le moment.</p></li>
+                {% endfor %}
+            </ul>
+
+            {% if session.get('admin_id') %}
+            <div class="admin-section">
+                <h3>➕ Ajouter un nouvel article</h3>
+                <form method="POST" action="{{ url_for('ajouter_nouvel_article') }}" enctype="multipart/form-data">
+                    <div>
+                        <label for="titre">Titre :</label>
+                        <input type="text" id="titre" name="titre" required>
+                    </div>
+                    <div>
+                        <label for="contenu">Contenu :</label>
+                        <textarea id="contenu" name="contenu" rows="8" required></textarea>
+                    </div>
+                    <div>
+                        <label for="image">Image (optionnel) :</label>
+                        <input type="file" id="image" name="image" accept="image/*">
+                        <small>Formats acceptés: PNG, JPG, JPEG, GIF (Max 5 MB)</small>
+                    </div>
+                    <div>
+                        <label for="pdf">Fichier PDF (optionnel) :</label>
+                        <input type="file" id="pdf" name="pdf" accept=".pdf">
+                        <small>Format: PDF uniquement (Max 5 MB)</small>
+                    </div>
+                    <button type="submit">✅ Ajouter l'article</button>
+                </form>
+            </div>
+            {% endif %}
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Les Sauveteurs de Goma</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

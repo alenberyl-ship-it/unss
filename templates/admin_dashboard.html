@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de Bord Administrateur</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>🛡️ Tableau de Bord Administrateur</h1>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">🏠 Accueil</a></li>
+                <li><a href="{{ url_for('liste_membres') }}">👥 Membres</a></li>
+                <li><a href="{{ url_for('admin_dashboard') }}">⚙️ Admin</a></li>
+                <li><a href="{{ url_for('logout') }}">🚪 Déconnexion</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="admin-dashboard content-section">
+        <!-- Gestion des Membres -->
+        <div class="admin-section">
+            <h2>👥 Gestion des Membres</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+                {% for membre in membres %}
+                    <div class="member-card">
+                        {% if membre[5] %}
+                            <img src="{{ membre[5] }}" alt="Photo de {{ membre[1] }}" class="member-avatar">
+                        {% else %}
+                            <div class="member-avatar" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #0e4863, #136f65); color: white; font-size: 3em;">👤</div>
+                        {% endif %}
+                        <div class="member-info">
+                            <div class="member-name">{{ membre[1] }}</div>
+                            <div class="member-role">{{ membre[2] or 'Membre' }}</div>
+                            <div class="member-contact">{{ membre[3] }}</div>
+                            {% if membre[6] == 1 %}
+                                <span style="background: #ffc107; color: #000; padding: 0.3em 0.8em; border-radius: 20px; font-size: 0.85em; font-weight: 600;">👑 Admin</span>
+                            {% endif %}
+                            <form method="POST" action="{{ url_for('supprimer_membre_admin', membre_id=membre[0]) }}" style="margin-top: 1em;">
+                                <button type="submit" class="btn danger" onclick="return confirm('Êtes-vous sûr ?')" style="width: 100%;">🗑️ Supprimer</button>
+                            </form>
+                        </div>
+                    </div>
+                {% else %}
+                    <p style="grid-column: 1 / -1; text-align: center; color: #999;">Aucun membre enregistré.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Ajouter un nouveau membre -->
+        <div class="admin-section">
+            <h3>➕ Ajouter un nouveau membre</h3>
+            <form method="POST" action="{{ url_for('ajouter_nouveau_membre_admin') }}">
+                <div class="form-row">
+                    <div>
+                        <label for="nom">Nom complet :</label>
+                        <input type="text" id="nom" name="nom" required>
+                    </div>
+                    <div>
+                        <label for="role">Rôle :</label>
+                        <input type="text" id="role" name="role" placeholder="Ex: Sauveteur, Formateur...">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div>
+                        <label for="contact">Contact (Email ou Téléphone) :</label>
+                        <input type="text" id="contact" name="contact" required>
+                    </div>
+                    <div>
+                        <label for="password">Mot de passe :</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div>
+                        <label for="photo_profil">Photo de Profil (URL) :</label>
+                        <input type="text" id="photo_profil" name="photo_profil" placeholder="https://...">
+                    </div>
+                    <div style="display: flex; align-items: flex-end;">
+                        <label>
+                            <input type="checkbox" id="is_admin" name="is_admin" value="1">
+                            👑 Administrateur
+                        </label>
+                    </div>
+                </div>
+                <button type="submit" style="width: 100%;">✅ Ajouter le membre</button>
+            </form>
+        </div>
+
+        <!-- Gestion des Articles -->
+        <div class="admin-section">
+            <h2>📄 Gestion des Articles</h2>
+            <ul style="list-style: none; padding: 0;">
+                {% for article in articles %}
+                    <li class="article-item">
+                        {% if article[4] %}
+                            <img src="{{ article[4] }}" alt="{{ article[1] }}" class="article-image" style="max-height: 200px; object-fit: cover;">
+                        {% endif %}
+                        <h3>{{ article[1] }}</h3>
+                        <p>{{ article[2] | truncate(200) }}</p>
+                        <div class="article-meta">
+                            <span>📅 {{ article[3] }}</span>
+                            {% if article[5] %}
+                                <a href="{{ url_for('download_file', filepath=article[5]) }}" class="btn" download>📄 PDF</a>
+                            {% endif %}
+                        </div>
+                        <form method="POST" action="{{ url_for('supprimer_article', article_id=article[0]) }}">
+                            <button type="submit" class="btn danger" onclick="return confirm('Êtes-vous sûr ?')">🗑️ Supprimer</button>
+                        </form>
+                    </li>
+                {% else %}
+                    <li><p style="text-align: center; color: #999;">Aucun article pour le moment.</p></li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Ajouter un nouvel article -->
+        <div class="admin-section">
+            <h3>➕ Ajouter un nouvel article</h3>
+            <form method="POST" action="{{ url_for('ajouter_nouvel_article') }}" enctype="multipart/form-data">
+                <div>
+                    <label for="titre">Titre :</label>
+                    <input type="text" id="titre" name="titre" required>
+                </div>
+                <div>
+                    <label for="contenu">Contenu :</label>
+                    <textarea id="contenu" name="contenu" rows="8" required></textarea>
+                </div>
+                <div class="form-row">
+                    <div>
+                        <label for="image">Image (optionnel) :</label>
+                        <input type="file" id="image" name="image" accept="image/*">
+                        <small>PNG, JPG, JPEG, GIF (Max 5 MB)</small>
+                    </div>
+                    <div>
+                        <label for="pdf">Fichier PDF (optionnel) :</label>
+                        <input type="file" id="pdf" name="pdf" accept=".pdf">
+                        <small>PDF uniquement (Max 5 MB)</small>
+                    </div>
+                </div>
+                <button type="submit" style="width: 100%;">✅ Ajouter l'article</button>
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Les Sauveteurs de Goma | Tableau de Bord Administrateur</p>
+    </footer>
+</body>
+</html>

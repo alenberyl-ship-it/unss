@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contactez-nous</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>📧 Contactez-Nous</h1>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">🏠 Accueil</a></li>
+                <li><a href="{{ url_for('liste_membres') }}">👥 Membres</a></li>
+                <li><a href="{{ url_for('contact') }}">📧 Contact</a></li>
+                {% if session.get('admin_id') %}
+                    <li><a href="{{ url_for('admin_dashboard') }}">⚙️ Admin</a></li>
+                    <li><a href="{{ url_for('logout') }}">🚪 Déconnexion</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="content-section">
+            <h2>Formulaire de Contact</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 2em;">
+                Vous avez une question ou souhaitez nous contacter ? Remplissez le formulaire ci-dessous et nous vous répondrons dans les meilleurs délais.
+            </p>
+            <form method="POST" style="max-width: 600px; margin: 0 auto;">
+                <div>
+                    <label for="nom">👤 Votre Nom :</label>
+                    <input type="text" id="nom" name="nom" placeholder="Jean Dupont" required>
+                </div>
+                <div>
+                    <label for="email">📧 Votre Email :</label>
+                    <input type="email" id="email" name="email" placeholder="jean@example.com" required>
+                </div>
+                <div>
+                    <label for="message">💬 Votre Message :</label>
+                    <textarea id="message" name="message" placeholder="Écrivez votre message ici..." rows="6" required></textarea>
+                </div>
+                <button type="submit" style="width: 100%;">✅ Envoyer le Message</button>
+            </form>
+        </section>
+
+        <section class="content-section">
+            <h2>📍 Informations de Contact</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 2em;">
+                <div style="padding: 20px; background: #f9f9f9; border-radius: 10px; border-left: 5px solid #136f65;">
+                    <h3 style="color: #0e4863; margin-bottom: 0.5em;">📧 Email</h3>
+                    <p><a href="mailto:contact@sauveteursgoma.org">contact@sauveteursgoma.org</a></p>
+                </div>
+                <div style="padding: 20px; background: #f9f9f9; border-radius: 10px; border-left: 5px solid #136f65;">
+                    <h3 style="color: #0e4863; margin-bottom: 0.5em;">📞 Téléphone Urgence</h3>
+                    <p><a href="tel:+243XXXXXXXXX">+243 XX XXX XX XX</a></p>
+                </div>
+                <div style="padding: 20px; background: #f9f9f9; border-radius: 10px; border-left: 5px solid #136f65;">
+                    <h3 style="color: #0e4863; margin-bottom: 0.5em;">📍 Localisation</h3>
+                    <p>Goma, République Démocratique du Congo</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Les Sauveteurs de Goma</p>
+    </footer>
+</body>
+</html>
